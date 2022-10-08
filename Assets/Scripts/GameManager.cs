@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
     public GameObject woodDock;
     //
     public GameObject tile;
+    public string tileName;
 
     private bool setupComplete = false;
     private bool playerTurn = true;
@@ -58,6 +59,10 @@ public class GameManager : MonoBehaviour
         replayBtn.onClick.AddListener(() => ReplayClicked());
         enemyShips = enemyScript.PlaceEnemyShips();
 
+    
+
+
+        /*
         // VOICE
         actions.Add("forward", Forward); //worked
        // actions.Add("bee", Forward);//worked on low
@@ -85,9 +90,11 @@ public class GameManager : MonoBehaviour
         keywordRecognizer.Start();
 
         //////////////////////////////////
+     */
     }
-
+    /*
     // VOICE //////////////////////////////////
+    
     public void RecognizedSpeech(PhraseRecognizedEventArgs speech)
     {
         Debug.Log(speech.text);
@@ -110,24 +117,26 @@ public class GameManager : MonoBehaviour
             Instantiate(missilePrefab, tilePos, missilePrefab.transform.rotation);
         }
     }
-    //////////////////////////////////
+    */
+        //////////////////////////////////
 
 
-    private void NextShipClicked()
+        private void NextShipClicked()
     {
-        if (!shipScript.OnGameBoard())
+        if (!shipScript.OnGameBoard())  //if size of ship is not equal to # of tiles it touches, flash red
         {
             shipScript.FlashColor(Color.red);
         }
         else
         {
-            if (shipIndex <= ships.Length - 2)
-            {
+            //if (shipIndex <= ships.Length - 2)  //if not all ships positioned, flash next one yellow
+                if (shipIndex <= ships.Length - 5)  //-6 to skip
+                {
                 shipIndex++;
                 shipScript = ships[shipIndex].GetComponent<ShipScript>();
                 shipScript.FlashColor(Color.yellow);
             }
-            else
+            else  //otherwise go into game mode
             {
                 rotateBtn.gameObject.SetActive(false);
                 nextBtn.gameObject.SetActive(false);
@@ -144,15 +153,24 @@ public class GameManager : MonoBehaviour
     {
         if (setupComplete && playerTurn)
         {
-            Vector3 tilePos = tile.transform.position;
-            tilePos.y += 15;
+            
+            Vector3 tilePos = tile.transform.position;  // tilePos is created on selected tile's xyz
+            tilePos.y += 25;  
+            //Debug.Log("tilePos is _______________ for missile_______" + tilePos); // (9.00, 0.58, 11.12) [for Tile 75 /E3] and (11.25, 0.58, 11.12) [for Tile 76 /F3]
             playerTurn = false;
             Instantiate(missilePrefab, tilePos, missilePrefab.transform.rotation);
         }
-        else if (!setupComplete)
+        else if (!setupComplete)  //if still positioning ships, place ship on selected tile
         {
-            PlaceShip(tile);
-            shipScript.SetClickedTile(tile);
+            tileName = tile.transform.name;
+
+            if (tileName.Contains("EnemyTile") == false)  //check chosen tile is on player board
+            {
+                PlaceShip(tile);
+                shipScript.SetClickedTile(tile);  // script states simply:  clickedTile = tile;
+                
+                Debug.Log("'tile.transform.name is____________________________" + tile.transform.name);
+            }
         }
     }
 
@@ -160,8 +178,10 @@ public class GameManager : MonoBehaviour
     {
         shipScript = ships[shipIndex].GetComponent<ShipScript>();
         shipScript.ClearTileList();
-        Vector3 newVec = shipScript.GetOffsetVec(tile.transform.position);
-        ships[shipIndex].transform.localPosition = newVec;
+        Debug.Log("__________________shipScript.GetOffsetVec(tile.transform.position) is_____" + shipScript.GetOffsetVec(tile.transform.position)); 
+        Vector3 newVec = shipScript.GetOffsetVec(tile.transform.position);  //sends tile's xyz to shipscript to add offsets
+        Debug.Log ("________________________________________________________now neVec is_____" + newVec); //(-53.00, 20.00, -43.62) stayed at 20. = Tile 45
+        ships[shipIndex].transform.localPosition = newVec; //moves ship to newVec location
     }
 
     void RotateClicked()

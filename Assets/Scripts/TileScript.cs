@@ -39,17 +39,18 @@ public class TileScript : MonoBehaviour
         // define ray, as from cmaeras perspective, input the mouse position assigining it to an xy point (mousePosition)
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         // to pay attention only to correct tile
+        //Debug.Log("ray 1 ______________________________" + ray); // provides 3 coordinates of mouse for Origin and Direction, eg (10.94, 19.64, 2.32), (-0.83, -0.54, -0.11) or when off screen: (10.94, 19.64, 2.32) and (0.68, -0.64, -0.36)
+                                                                 // before first click:  (10.04, 19.68, 2.44), Dir: (-0.80, -0.58, -0.16)
         if (Physics.Raycast(ray, out hit))
         {
-            //Debug.Log("ray ____________________" + ray); // provides 3 coordinates of mouse when on board
+            //Debug.Log("ray ____________________" + ray); //when clicked
+            
             //check its the tile that was selected through the mouse
             //is mouse button down AND is the name of what we just collided (with ray) the same as this item (gameObject.name)
-
-
             if (Input.GetMouseButtonDown(0) && hit.collider.gameObject.name == gameObject.name)
             {
 
-                //Debug.Log("gameObject.name ____________________" + gameObject.name); //"Tile (32)"
+                Debug.Log("_____(from TileScript)_________you just pressed " + gameObject.name); //"Tile (32)"  this updates first and sends to game manager
 
 
                 if (missileHit == false)
