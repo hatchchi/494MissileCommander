@@ -14,5 +14,6 @@ public class MissileScript : MonoBehaviour
     {
         gameManager.CheckHit(collision.gameObject);
         Destroy(gameObject);
+        
     }
 }

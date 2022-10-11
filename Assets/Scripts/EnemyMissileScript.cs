@@ -11,9 +11,11 @@ public class EnemyMissileScript : MonoBehaviour
 
     void Start()
     {
+        
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        enemyScript = GameObject.Find("Enemy").GetComponent<EnemyScript>();
-
+        
+        enemyScript = GameObject.Find("EnemyBoard").GetComponent<EnemyScript>();
+        Debug.Log("completed enemy script find");
     }
 
     private void OnCollisionEnter(Collision collision)
