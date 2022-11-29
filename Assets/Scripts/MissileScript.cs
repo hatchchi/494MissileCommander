@@ -11,7 +11,7 @@ public class MissileScript : MonoBehaviour
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        splash = GameObject.Find("Splash2").GetComponent<AudioSource> ();
+        splash = GameObject.Find("Splash2").GetComponent<AudioSource>();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -19,7 +19,6 @@ public class MissileScript : MonoBehaviour
         gameManager.CheckHit(collision.gameObject);
         Destroy(gameObject);
         splash.Play();
-        //Debug.Log("attempted enemy splash sound");
     }
 }
 

@@ -15,12 +15,12 @@ public class GameManager : MonoBehaviour
     public EnemyScript enemyScript;
     private ShipScript shipScript;
     public TimerScript timerScript;
-  
+
     private List<int[]> enemyShips;
     private int shipIndex = 0;
     public List<TileScript> allTileScripts;
     private bool firstTime;
-    
+
 
     [Header("HUD")]
     public Button nextBtn;
@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
     public Button quitBtn;
     public GameObject gameCodeBox;
     public Text connecting;
-    
+
 
     private Text gameCodeText;
     private Text receivedCode;
@@ -62,12 +62,12 @@ public class GameManager : MonoBehaviour
     public GameObject scores;
     public GameObject timer;
     public GameObject CountdownText;
-    
 
 
-    public float timeLeft; 
+
+    public float timeLeft;
     public bool flipBoard;
-    
+
     public Vector3 tilePosTemp;
 
     //
@@ -75,12 +75,11 @@ public class GameManager : MonoBehaviour
     public GameObject Etile;
     public GameObject targetTile;
     public string tileName;
-    
 
     private bool setupComplete = false;
-    private bool playerTurn = true;
+    private bool playerTurn;
     private bool onlineGame = false;
-    
+
 
     private List<GameObject> playerFires = new List<GameObject>();
     private List<GameObject> enemyFires = new List<GameObject>();
@@ -130,49 +129,68 @@ public class GameManager : MonoBehaviour
     public AudioSource nows;
     public AudioSource pres;
 
-    
+
     private KeywordRecognizer keywordRecognizer;
     private Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
 
+    private GameServerConnection gsConnection;
     void Start()
     {
         //onlinePlay = false;
-       // aiPlay = false;
+        // aiPlay = false;
         firstTime = true;
         firstShip = true;
 
         //activate opening buttons
-        playAIBtn.onClick.AddListener(() => { onlineGame = false; startGame(); });
-        playOnlineBtn.onClick.AddListener(() => chooseOnlineGame()); 
+        playAIBtn.onClick.AddListener(() =>
+        {
+            onlineGame = false;
+            playerTurn = true;
+            startGame();
+        });
+        playOnlineBtn.onClick.AddListener(() => { onlineGame = true; chooseOnlineGame(); });
         quitBtn.onClick.AddListener(() => quitGame());
-        
+
         voiceSetup();
     }
 
     private void chooseOnlineGame()
     {
-        openingInstructions.text = "Game found.... would you like to start?"; 
-        
-        playAIBtn.gameObject.SetActive(false);
-        playOnlineBtn.gameObject.SetActive(false);
-        joinBtn.gameObject.SetActive(true);
-        declineBtn.gameObject.SetActive(true);
-        
-        joinBtn.onClick.AddListener(() => { onlineGame = true; startGame(); });
-        declineBtn.onClick.AddListener(() =>
-        {
-            playAIBtn.gameObject.SetActive(true);
-            playOnlineBtn.gameObject.SetActive(true);
-            joinBtn.gameObject.SetActive(false);
-            declineBtn.gameObject.SetActive(false);
+        gsConnection =
+            new GameServerConnection(new Uri("ws://localhost:8082"));
 
-            openingInstructions.text = "Please choose an option to start the game";
-        } );
+        playerTurn = gsConnection.turn == gsConnection.playerIndex;
+        Debug.Log(playerTurn);
+
+        gsConnection.JoinGame(() =>
+        {
+            openingInstructions.text = "Game found.... would you like to start?";
+
+            playAIBtn.gameObject.SetActive(false);
+            playOnlineBtn.gameObject.SetActive(false);
+            joinBtn.gameObject.SetActive(true);
+            declineBtn.gameObject.SetActive(true);
+
+            joinBtn.onClick.AddListener(() =>
+            {
+                startGame();
+            });
+            declineBtn.onClick.AddListener(() =>
+            {
+                playAIBtn.gameObject.SetActive(true);
+                playOnlineBtn.gameObject.SetActive(true);
+                joinBtn.gameObject.SetActive(false);
+                declineBtn.gameObject.SetActive(false);
+
+                openingInstructions.text = "Please choose an option to start the game";
+            });
+        });
+
     }
 
     private void startGame()
     {
-        openingInstructions.text = " "; 
+        openingInstructions.text = " ";
         playAIBtn.gameObject.SetActive(false);
         playOnlineBtn.gameObject.SetActive(false);
         joinBtn.gameObject.SetActive(false);
@@ -181,37 +199,34 @@ public class GameManager : MonoBehaviour
         nextBtn.onClick.AddListener(() => NextShipClicked());
         rotateBtn.onClick.AddListener(() => RotateClicked());
         commenceBtn.onClick.AddListener(() => NextShipClicked());
-        
+
         woodDock.SetActive(true);
         myTiles.SetActive(true);
 
         shipScript = ships[shipIndex].GetComponent<ShipScript>();
         shipScript.ShipAppear();
 
-        if(onlineGame == false)
+        if (onlineGame == false)
         {
             enemyShips = enemyScript.PlaceEnemyShips();
         }
-        else
-        {
-            //probably don't need anything here
-        }
+
 
         spokenNumbers.text = " ";
         spokenLetters.text = " ";
         openingInstructions.text = " ";
         fire.text = " ";
         instructions.text = "Tap a ship then tap where to place it"; //***************need updated voice
-        
+
         plea.Play();
-        }
+    }
 
     private void quitGame()
     {
         openingInstructions.text = "Are you sure you'd like to quit?  Y  /   N ";
     }
 
-    
+
     private void NextShipClicked()  //when 'continue' button is pressed
     {
         if (!shipScript.OnGameBoard())  //if size of ship is not equal to # of tiles it touches, flash red
@@ -223,6 +238,11 @@ public class GameManager : MonoBehaviour
             //if (shipIndex <= ships.Length - 2)  //if not all ships positioned, flash next one yellow
             if (shipIndex <= ships.Length - 2)  //-6 to skip
             {
+                if (onlineGame)
+                {
+                    var currentShipTiles = Array.ConvertAll(shipScript.touchTiles.ToArray(), (tile) => tile.name);
+                    gsConnection.setShip(shipIndex, currentShipTiles);
+                }
                 shipIndex++;  //select next ship
                 shipScript = ships[shipIndex].GetComponent<ShipScript>();
                 Debug.Log("ships[shipIndex]" + ships[shipIndex]); //Cuiser v7 (gameobject)
@@ -237,20 +257,29 @@ public class GameManager : MonoBehaviour
             }
             else  //otherwise go into game mode (first run)
             {
-                commenceBtn.gameObject.SetActive(false); 
+                setupComplete = true;
+
+                commenceBtn.gameObject.SetActive(false);
                 nextBtn.gameObject.SetActive(false);
                 rotateBtn.gameObject.SetActive(false);
                 woodDock.SetActive(false);
                 upperInstructions.text = " ";
                 //pivot view around and show enemy board
                 viewAngle.transform.Rotate(-42, 0, 0);
-
+                if (onlineGame)
+                {
+                    var currentShipTiles = Array.ConvertAll(shipScript.touchTiles.ToArray(), (tile) => tile.name);
+                    gsConnection.setShip(shipIndex, currentShipTiles);
+                    if (!gsConnection.IsPlayerTurn())
+                    {
+                        EndPlayerTurn();
+                    }
+                }
                 instructions.text = "First tell me just the letter ";
-                subInstructions.text = " ";  
+                subInstructions.text = " ";
                 subSubInstructions.text = " ";
                 wher.Play(); /////////////////////////////need to update the voice  to "First tell me just the letter"
                 keywordRecognizer.Start();
-                setupComplete = true;
                 enemyBoard.gameObject.SetActive(true);
             }
         }
@@ -260,14 +289,12 @@ public class GameManager : MonoBehaviour
     {
         if (setupComplete && playerTurn)
         {
-            
             Vector3 tilePos = tile.transform.position;  // tilePos is created on selected tile's xyz
-            Debug.Log("tile clicked tilePos" + tilePos);  
 
             tilePos.y += 10;  // player missile starting height
             float fraction = 0.5f;
             tilePos.z -= fraction;
-            //tilePosTemp = tilePos;
+
             Instantiate(missilePrefab, tilePos, missilePrefab.transform.rotation);
             playerTurn = false;
         }
@@ -281,7 +308,7 @@ public class GameManager : MonoBehaviour
                 PlaceShip(tile);
                 splash.PlayDelayed(1);
                 shipScript.SetClickedTile(tile);  // script states simply:  clickedTile = tile;
-            
+
                 rotateBtn.gameObject.SetActive(true);
                 nextBtn.gameObject.SetActive(true);
                 upperInstructions.text = "Press";
@@ -354,49 +381,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-    private void sendingTileInfo()
-    {
-        //send variable tileSend to server
-
-        //wait for reply with yourTileHit (true/false)
-        //show 'waiting for enemy's response' on screen
-
-        //if receive yourTileHit (whether player's misile hit or missed)
-        //  if we hit enemy ship, (if yourTileHit = true),
-        //      playerComments.text = "I hit your battleship!";
-        //      enemyComments.text = "argh!!";
-        //      startTimer(300);
-        //      tile.GetComponent<TileScript>().SetTileColor(1, new Color32(255, 0, 0, 255));
-        //      tile.GetComponent<TileScript>().SwitchColors(1);
-
-        //  else yourTileHit false,
-        //      tile.GetComponent<TileScript>().SetTileColor(1, new Color32(38, 57, 76, 255));
-        //      tile.GetComponent<TileScript>().SwitchColors(1);
-        //      enemyComments.text = "Missed, no ship there.";
-        //      startTimer(300);
-
-        //if no reply within 10 seconds,  
-        //      go to check hit, which will compare against enemey's pre-chosen random positions)
-        //      enemyScript.NPCTurn();
-
-    }
-
-    private void receivingTileInfo()  // where enemy is aiming
-    {
-        //listen for tileReceived from server
-        //if receive tileReceived (enemy's guess) from server, set new var 'received' to true
-        //      go to EnemyScript (which needs if statements to check for 'received' and skip random calculations with if clause -
-        //      also add line in EnemyScript to go to sendMyTileStatus()
-
-        //if no reply within 10 seconds,  go to EnemyScript anyway run AI emeny (using random shots)
-    }
-
-    private void sendMyTileStatus(bool yourTileHit)  // whether enemy hit my tile
-    {
-        //send variable yourTileHit to server
-        // (nothing else, it'll continue game)
-    }
-
     ////////////////////////////////////////////SPEECH
 
     private void voiceSetup()
@@ -431,6 +415,7 @@ public class GameManager : MonoBehaviour
             int tileSend = (tileNumber * 10) + tileLetter;
             Debug.Log("tileSend =" + tileSend);
             tileName = "ETile (" + tileSend + ")";
+            Debug.Log(tileSend);
             targetTile = GameObject.Find(tileName);
             TileClicked(targetTile);
             keywordRecognizer.Stop();
@@ -446,7 +431,7 @@ public class GameManager : MonoBehaviour
     private void KeywordRecognizer_OnPhraseRecognized(PhraseRecognizedEventArgs speech)
     {
         System.Action keywordAction;
-        
+
         // if the keyword recognized is in our dictionary, call that Action.
         if (keywords.TryGetValue(speech.text, out keywordAction))
         {
@@ -486,6 +471,59 @@ public class GameManager : MonoBehaviour
 
     public void CheckHit(GameObject tile)  //whether player hit enemy
     {
+        if (onlineGame)
+        {
+            gsConnection.Fire(tile.name);
+
+            string result = gsConnection.Fire(tile.name);
+
+            switch (result)
+            {
+                case "hit":
+                    spokenLetters.text = " ";
+                    spokenNumbers.text = " ";
+                    fire.text = " ";
+                    blast.Play();
+                    playerComments.text = "You hit their battleship!";
+                    youh.PlayDelayed(2);
+                    enemyComments.text = "grrrrr";
+                    grrr.PlayDelayed(4);
+
+                    tile.GetComponent<TileScript>().SetTileColor(1, new Color32(255, 0, 0, 255));
+                    tile.GetComponent<TileScript>().SwitchColors(1);
+                    break;
+                case "sank":
+                    enemyShipCount--;
+                    instructions.text = " ";
+                    spokenLetters.text = " ";
+                    spokenNumbers.text = " ";
+                    fire.text = " ";
+                    blast.Play();
+                    playerComments.text = "Yay! You totally sank their battleship!";
+                    yayy.PlayDelayed(2);
+                    enemyComments.text = "argh!!";
+                    argh.PlayDelayed(4);
+                    enemyFires.Add(Instantiate(firePrefab, tile.transform.position, Quaternion.identity));
+                    tile.GetComponent<TileScript>().SetTileColor(1, new Color32(68, 0, 0, 255));
+                    tile.GetComponent<TileScript>().SwitchColors(1);
+                    break;
+                case "miss":
+                    tile.GetComponent<TileScript>().SetTileColor(1, new Color32(38, 57, 76, 255));
+                    tile.GetComponent<TileScript>().SwitchColors(1);
+                    splash.Play();
+                    enemyComments.text = "Missed!        OK, my turn now!";
+                    miss.PlayDelayed(1);
+                    okmy.PlayDelayed(2);
+                    timeLeft = 1;
+                    timerOn = true;
+                    break;
+            }
+            instructions.text = " ";
+            spokenLetters.text = " ";
+            spokenNumbers.text = " ";
+            Invoke("EndPlayerTurn", 1.0f);
+            return;
+        }
         int tileNum = Int32.Parse(Regex.Match(tile.name, @"\d+").Value);
         int hitCount = 0;
         foreach (int[] tileNumArray in enemyShips)
@@ -512,7 +550,7 @@ public class GameManager : MonoBehaviour
                     spokenLetters.text = " ";
                     spokenNumbers.text = " ";
                     fire.text = " ";
-                    blast.Play(); 
+                    blast.Play();
                     playerComments.text = "Yay! You totally sank their battleship!";
                     yayy.PlayDelayed(2);
                     enemyComments.text = "argh!!";
@@ -520,7 +558,7 @@ public class GameManager : MonoBehaviour
                     enemyFires.Add(Instantiate(firePrefab, tile.transform.position, Quaternion.identity));
                     tile.GetComponent<TileScript>().SetTileColor(1, new Color32(68, 0, 0, 255));
                     tile.GetComponent<TileScript>().SwitchColors(1);
-                    
+
                 }
                 else
                 {
@@ -533,13 +571,13 @@ public class GameManager : MonoBehaviour
                     youh.PlayDelayed(2);
                     enemyComments.text = "grrrrr";
                     grrr.PlayDelayed(4);
-                    
+
                     tile.GetComponent<TileScript>().SetTileColor(1, new Color32(255, 0, 0, 255));
                     tile.GetComponent<TileScript>().SwitchColors(1);
                 }
-                timeLeft = 2; 
+                timeLeft = 2;
                 timerOn = true;
-                
+
                 break;
             }
 
@@ -559,8 +597,6 @@ public class GameManager : MonoBehaviour
         spokenLetters.text = " ";
         spokenNumbers.text = " ";
         Invoke("EndPlayerTurn", 1.0f);
-
-        
     }
 
     public void EnemyHitPlayer(Vector3 tile, int tileNum, GameObject hitObj)  //invoked if successful hit
@@ -579,14 +615,14 @@ public class GameManager : MonoBehaviour
 
         enemyComments.text = "Ha ha! I got you!!";
         igot.PlayDelayed(1);
-        timeLeft = 3; 
+        timeLeft = 3;
         timerOn = true;
         //Debug.Log("Enemy just got a hit");
         Invoke("EndEnemyTurn", 2.0f);
-        
+
     }
 
-    private void EndPlayerTurn() 
+    private void EndPlayerTurn()
     {
         //keywordRecognizer.Stop();
 
@@ -599,11 +635,30 @@ public class GameManager : MonoBehaviour
 
         timeLeft = 2;
         timerOn = true;
+        if (onlineGame)
+        {
+            int guess = gsConnection.RecieveFire();
+            GameObject tile = GameObject.Find("Tile (" + guess + ")");  // guesses run from zero and not from one like tiles
+                                                                        //if there are more than one tile with that name, which does it choose?
+            Debug.Log("this is the name of the tile ememy chose:" + tile);
 
-        enemyScript.NPCTurn(); //selects next tile to aim for
+            Vector3 vec = tile.transform.position;  //get tile position
+            Debug.Log("this is the tile transform position:" + tile.transform.position);
+            //create new missile 25 above tile position
+            vec.y += 30;
+            GameObject missile = Instantiate(enemyMissilePrefab, vec, enemyMissilePrefab.transform.rotation);
+
+            missile.GetComponent<EnemyMissileScript>().SetTarget(guess);  //in other script it inputs 'guess' value to the variable 'targetTile'  
+            missile.GetComponent<EnemyMissileScript>().targetTileLocation = tile.transform.position;  //inputs tile position to variable 'targetTileLocation'
+            EndEnemyTurn();
+        }
+        else
+        {
+            enemyScript.NPCTurn(); //selects next tile to aim for
+        }
     }
 
-    public void EndEnemyTurn()  
+    public void EndEnemyTurn()
     {
         if (enemyShipCount < 1)
         {
@@ -621,22 +676,12 @@ public class GameManager : MonoBehaviour
             timerOn = true;
             firstTime = false;
         }
-        
+
         playerTurn = true;
         timeLeft = 1;
         timerOn = true;
         keywordRecognizer.Start();
     }
-
-    /*
-    private void ColorAllTiles(int colorIndex)
-    {
-        foreach (TileScript tileScript in allTileScripts)
-        {
-            tileScript.SwitchColors(colorIndex);
-        }
-    }
-    */
 
     void GameOver(string winner)
     {
@@ -647,11 +692,5 @@ public class GameManager : MonoBehaviour
         replayBtn.gameObject.SetActive(true);
         playerTurn = false;
     }
-    /*
-    void ReplayClicked()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-    */
 
 }

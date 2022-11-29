@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638052584360000000
-    m_Hash: 2617805060
+      ticks: 638052722450000000
+    m_Hash: 3908743539
   m_LockFileStatus:
     m_FilePath: /home/user/fastDrive/wbedu/Projects/494MissileCommander/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638052584370000000
-    m_Hash: 1028831124
+      ticks: 638052722450000000
+    m_Hash: 1992140172
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:
@@ -861,6 +861,99 @@ m_ResolvedPackages:
     path: 
   unityLifecycle:
     version: 1.6.4
+    nextVersion: 
+- packageId: com.unity.toolchain.linux-x86_64@2.0.3
+  testable: 0
+  isDirectDependency: 1
+  version: 2.0.3
+  source: 1
+  resolvedPath: /home/user/fastDrive/wbedu/Projects/494MissileCommander/Library/PackageCache/com.unity.toolchain.linux-x86_64@2.0.3
+  assetPath: Packages/com.unity.toolchain.linux-x86_64
+  name: com.unity.toolchain.linux-x86_64
+  displayName: Toolchain Linux x64
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: asset
+  description: Toolchain to build player target Linux x86_64 on host Linux x86_64
+  status: 4
+  errors: []
+  versions:
+    all:
+    - 0.1.5-preview
+    - 0.1.6-preview
+    - 0.1.7-preview
+    - 0.1.8-preview
+    - 0.1.9-preview
+    - 0.1.10-preview
+    - 0.1.11-preview
+    - 0.1.13-preview
+    - 0.1.14-preview
+    - 0.1.15-preview
+    - 0.1.16-preview
+    - 0.1.17-preview
+    - 0.1.18-preview
+    - 0.1.19-preview
+    - 1.0.0
+    - 2.0.0
+    - 2.0.1
+    - 2.0.2
+    - 2.0.3
+    compatible:
+    - 0.1.5-preview
+    - 0.1.6-preview
+    - 0.1.7-preview
+    - 0.1.8-preview
+    - 0.1.9-preview
+    - 0.1.10-preview
+    - 0.1.11-preview
+    - 0.1.13-preview
+    - 0.1.14-preview
+    - 0.1.15-preview
+    - 0.1.16-preview
+    - 0.1.17-preview
+    - 0.1.18-preview
+    - 0.1.19-preview
+    - 1.0.0
+    - 2.0.0
+    - 2.0.1
+    - 2.0.2
+    - 2.0.3
+    verified: 
+  dependencies:
+  - name: com.unity.sysroot
+    version: 2.0.4
+  - name: com.unity.sysroot.linux-x86_64
+    version: 2.0.3
+  resolvedDependencies:
+  - name: com.unity.sysroot
+    version: 2.0.4
+  - name: com.unity.sysroot.linux-x86_64
+    version: 2.0.3
+  keywords:
+  - toolchain
+  - linux
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+  hideInEditor: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 638036809710000000
+  documentationUrl: 
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.com/Unity-Technologies/com.unity.sysroot.git
+    revision: 573e391bf0f49bc3cce1c2eea80944b240187feb
+    path: 
+  unityLifecycle:
+    version: 
     nextVersion: 
 - packageId: com.unity.ugui@1.0.0
   testable: 0
@@ -2660,6 +2753,171 @@ m_ResolvedPackages:
     type: 
     url: 
     revision: 
+    path: 
+  unityLifecycle:
+    version: 
+    nextVersion: 
+- packageId: com.unity.sysroot@2.0.4
+  testable: 0
+  isDirectDependency: 0
+  version: 2.0.4
+  source: 1
+  resolvedPath: /home/user/fastDrive/wbedu/Projects/494MissileCommander/Library/PackageCache/com.unity.sysroot@2.0.4
+  assetPath: Packages/com.unity.sysroot
+  name: com.unity.sysroot
+  displayName: Sysroot Base
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: asset
+  description: This is the base sysroot package required by all sysroot and toolchain
+    packages
+  status: 4
+  errors: []
+  versions:
+    all:
+    - 0.1.7-preview
+    - 0.1.8-preview
+    - 0.1.9-preview
+    - 0.1.10-preview
+    - 0.1.11-preview
+    - 0.1.12-preview
+    - 0.1.14-preview
+    - 0.1.15-preview
+    - 0.1.16-preview
+    - 0.1.17-preview
+    - 0.1.18-preview
+    - 0.1.19-preview
+    - 1.0.0
+    - 2.0.0
+    - 2.0.2
+    - 2.0.3
+    - 2.0.4
+    compatible:
+    - 0.1.7-preview
+    - 0.1.8-preview
+    - 0.1.9-preview
+    - 0.1.10-preview
+    - 0.1.11-preview
+    - 0.1.12-preview
+    - 0.1.14-preview
+    - 0.1.15-preview
+    - 0.1.16-preview
+    - 0.1.17-preview
+    - 0.1.18-preview
+    - 0.1.19-preview
+    - 1.0.0
+    - 2.0.0
+    - 2.0.2
+    - 2.0.3
+    - 2.0.4
+    verified: 
+  dependencies: []
+  resolvedDependencies: []
+  keywords:
+  - unity
+  - linux
+  - sysroot
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+  hideInEditor: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 638036809600000000
+  documentationUrl: 
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.com/Unity-Technologies/com.unity.sysroot.git
+    revision: 573e391bf0f49bc3cce1c2eea80944b240187feb
+    path: 
+  unityLifecycle:
+    version: 
+    nextVersion: 
+- packageId: com.unity.sysroot.linux-x86_64@2.0.3
+  testable: 0
+  isDirectDependency: 0
+  version: 2.0.3
+  source: 1
+  resolvedPath: /home/user/fastDrive/wbedu/Projects/494MissileCommander/Library/PackageCache/com.unity.sysroot.linux-x86_64@2.0.3
+  assetPath: Packages/com.unity.sysroot.linux-x86_64
+  name: com.unity.sysroot.linux-x86_64
+  displayName: Sysroot Linux x64
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: asset
+  description: Sysroot used to build unity player for linux x86_64
+  status: 4
+  errors: []
+  versions:
+    all:
+    - 0.1.6-preview
+    - 0.1.7-preview
+    - 0.1.8-preview
+    - 0.1.9-preview
+    - 0.1.10-preview
+    - 0.1.11-preview
+    - 0.1.12-preview
+    - 0.1.13-preview
+    - 0.1.14-preview
+    - 0.1.15-preview
+    - 1.0.0
+    - 2.0.0
+    - 2.0.1
+    - 2.0.2
+    - 2.0.3
+    compatible:
+    - 0.1.6-preview
+    - 0.1.7-preview
+    - 0.1.8-preview
+    - 0.1.9-preview
+    - 0.1.10-preview
+    - 0.1.11-preview
+    - 0.1.12-preview
+    - 0.1.13-preview
+    - 0.1.14-preview
+    - 0.1.15-preview
+    - 1.0.0
+    - 2.0.0
+    - 2.0.1
+    - 2.0.2
+    - 2.0.3
+    verified: 
+  dependencies:
+  - name: com.unity.sysroot
+    version: 2.0.4
+  resolvedDependencies:
+  - name: com.unity.sysroot
+    version: 2.0.4
+  keywords:
+  - unity
+  - linux
+  - sysroot
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+  hideInEditor: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 638036809680000000
+  documentationUrl: 
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.com/Unity-Technologies/com.unity.sysroot.git
+    revision: 573e391bf0f49bc3cce1c2eea80944b240187feb
     path: 
   unityLifecycle:
     version: 
