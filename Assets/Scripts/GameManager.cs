@@ -473,8 +473,6 @@ public class GameManager : MonoBehaviour
     {
         if (onlineGame)
         {
-            gsConnection.Fire(tile.name);
-
             string result = gsConnection.Fire(tile.name);
 
             switch (result)
@@ -499,8 +497,8 @@ public class GameManager : MonoBehaviour
                     spokenNumbers.text = " ";
                     fire.text = " ";
                     blast.Play();
-                    playerComments.text = "Yay! You totally sank their battleship!";
                     yayy.PlayDelayed(2);
+                    playerComments.text = "Yay! You totally sank their battleship!";
                     enemyComments.text = "argh!!";
                     argh.PlayDelayed(4);
                     enemyFires.Add(Instantiate(firePrefab, tile.transform.position, Quaternion.identity));
@@ -516,6 +514,9 @@ public class GameManager : MonoBehaviour
                     okmy.PlayDelayed(2);
                     timeLeft = 1;
                     timerOn = true;
+                    break;
+                case "Win":
+                    GameOver("Ha ha, I won!!!");
                     break;
             }
             instructions.text = " ";
