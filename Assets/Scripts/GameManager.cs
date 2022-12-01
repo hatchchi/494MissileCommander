@@ -128,6 +128,9 @@ public class GameManager : MonoBehaviour
     public AudioSource shoo;
     public AudioSource nows;
     public AudioSource pres;
+    public AudioSource tapa;
+    public AudioSource firs;
+    public AudioSource chan;
 
 
     private KeywordRecognizer keywordRecognizer;
@@ -216,9 +219,9 @@ public class GameManager : MonoBehaviour
         spokenLetters.text = " ";
         openingInstructions.text = " ";
         fire.text = " ";
-        instructions.text = "Tap a ship then tap where to place it"; //***************need updated voice
+        instructions.text = "Tap a ship then tap where to place it";
 
-        plea.Play();
+        tapa.Play();
     }
 
     private void quitGame()
@@ -278,7 +281,7 @@ public class GameManager : MonoBehaviour
                 instructions.text = "First tell me just the letter ";
                 subInstructions.text = " ";
                 subSubInstructions.text = " ";
-                wher.Play(); /////////////////////////////need to update the voice  to "First tell me just the letter"
+                firs.Play();
                 keywordRecognizer.Start();
                 enemyBoard.gameObject.SetActive(true);
             }
@@ -355,10 +358,10 @@ public class GameManager : MonoBehaviour
                 if (spokenNumbers.text != " ")
                 {
                     subInstructions.text = " ";
-                    //voice needed /////////////////////////////////////////////voice needed: "change a letter or number"
+
                     //voice edit needed /////////////////////////////////////////////voice edit to: "OR say Bombs away when ready"
                     instructions.text = "change a letter or number ....or say 'BOMBS AWAY!' when ready";
-                    sayf.Play();
+                    chan.Play();
 
                     firstTime = false;
                 }
